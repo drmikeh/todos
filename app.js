@@ -4,8 +4,8 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-var methodOverride = require('method-override');
 var mongoose = require('mongoose');
+var methodOverride = require('method-override');
 
 // Routes
 var homeRouter = require('./routes/index');

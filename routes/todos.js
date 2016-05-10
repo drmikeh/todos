@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+
 var Todo = require('../models/todo');
 
 function makeError(res, message, status) {
@@ -12,7 +13,7 @@ function makeError(res, message, status) {
 // INDEX
 router.get('/', function(req, res, next) {
   // get all the todos and render the index view
-  Todo.find({})
+  Todo.find({}).sort('-createdAt')
   .then(function(todos) {
     res.render('todos/index', { todos: todos } );
   }, function(err) {
@@ -43,7 +44,7 @@ router.get('/:id', function(req, res, next) {
 // CREATE
 router.post('/', function(req, res, next) {
   var todo = new Todo({
-    title: req.body.title,
+    title:     req.body.title,
     completed: req.body.completed ? true : false
   });
   todo.save()
@@ -85,6 +86,21 @@ router.put('/:id', function(req, res, next) {
 router.delete('/:id', function(req, res, next) {
   Todo.findByIdAndRemove(req.params.id)
   .then(function() {
+    res.redirect('/todos');
+  }, function(err) {
+    return next(err);
+  });
+});
+
+// TOGGLE completed
+router.get('/:id/toggle', function(req, res, next) {
+  Todo.findById(req.params.id)
+  .then(function(todo) {
+    if (!todo) return next(makeError(res, 'Document not found', 404));
+    todo.completed = !todo.completed;
+    return todo.save();
+  })
+  .then(function(saved) {
     res.redirect('/todos');
   }, function(err) {
     return next(err);
